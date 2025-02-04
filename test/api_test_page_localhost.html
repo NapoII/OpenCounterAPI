@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenCounterAPI localhost Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 40px; }
+        .badge { color: white; padding: 5px 10px; border-radius: 8px; font-weight: bold; display: inline-block; margin: 5px; }
+        .red { background: linear-gradient(45deg, rgba(255, 78, 80, 0.8), rgba(249, 212, 35, 0.8)); }
+        .blue { background: linear-gradient(45deg, rgba(54, 209, 220, 0.8), rgba(91, 134, 229, 0.8)); }
+        .green { background: linear-gradient(45deg, rgba(17, 153, 142, 0.8), rgba(56, 239, 125, 0.8)); }
+        .yellow { background: linear-gradient(45deg, rgba(255, 165, 0, 0.8), rgba(255, 215, 0, 0.8)); }
+        .purple { background: linear-gradient(45deg, rgba(138, 43, 226, 0.8), rgba(75, 0, 130, 0.8)); }
+        table { width: 60%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: #f4f4f4; }
+        pre { background: #eee; padding: 10px; border-radius: 5px; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <h2>📊 OpenCounterAPI localhost Test Page</h2>
+    <p>This page tests the API by sending a request and displaying the statistical data.</p>
+    <p><strong>http://localhost:8800/api/counter</strong></p>
+    <!-- Badge Display -->
+    <div>
+        <span id="now" class="badge red">Now: Loading...</span>
+        <span id="today" class="badge blue">Today: Loading...</span>
+        <span id="week" class="badge green">Week: Loading...</span>
+        <span id="month" class="badge yellow">Month: Loading...</span>
+        <span id="user_uniq" class="badge purple">Unique Users: Loading...</span>
+    </div>
+
+    <!-- Table Display -->
+    <table>
+        <tr><th>Statistic</th><th>Value</th></tr>
+        <tr><td>Total Visits</td><td id="totalVisits">Loading...</td></tr>
+        <tr><td>Unique Users</td><td id="uniqueUsers">Loading...</td></tr>
+        <tr><td>Now</td><td id="table_now">Loading...</td></tr>
+        <tr><td>Today</td><td id="table_today">Loading...</td></tr>
+        <tr><td>This Week</td><td id="table_week">Loading...</td></tr>
+        <tr><td>This Month</td><td id="table_month">Loading...</td></tr>
+    </table>
+
+    <!-- JSON Raw Data Display -->
+    <h3>📜 Raw Data:</h3>
+    <pre id="rawData">Loading...</pre>
+
+    <script>
+        async function fetchStats() {
+            const pageName = "api_test_page_localhost"; // Change this value for different pages
+            const response = await fetch("http://localhost:8800/api/counter", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ page_name: pageName })
+            });
+
+            if (!response.ok) {
+                document.getElementById("rawData").innerText = "Error loading data!";
+                return;
+            }
+
+            const data = await response.json();
+            console.log("API Response:", data);
+
+            // Extracting relevant values
+            const now = data.date_stats?.now?.[0] || 0;
+            const today = data.date_stats?.today?.[0] || 0;
+            const week = data.date_stats?.week?.[0] || 0;
+            const month = data.date_stats?.month?.[0] || 0;
+            const userUniq = data.user_uniq || 0;
+
+            // Updating badge values
+            document.getElementById("now").innerText = `Now: ${now}`;
+            document.getElementById("today").innerText = `Today: ${today}`;
+            document.getElementById("week").innerText = `Week: ${week}`;
+            document.getElementById("month").innerText = `Month: ${month}`;
+            document.getElementById("user_uniq").innerText = `Unique Users: ${userUniq}`;
+
+            // Updating table values
+            document.getElementById("totalVisits").innerText = data.user_count_sum;
+            document.getElementById("uniqueUsers").innerText = userUniq;
+            document.getElementById("table_now").innerText = now;
+            document.getElementById("table_today").innerText = today;
+            document.getElementById("table_week").innerText = week;
+            document.getElementById("table_month").innerText = month;
+
+            // Displaying raw JSON data
+            document.getElementById("rawData").innerText = JSON.stringify(data, null, 2);
+        }
+
+        fetchStats();
+    </script>
+
+</body>
+</html>
