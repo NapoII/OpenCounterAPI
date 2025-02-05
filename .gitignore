@@ -1,4 +1,5 @@
 /OpenCounterAPI.egg-info
+**/data/
 **/build/
 **/dist/
 **/log/
@@ -9,7 +10,7 @@
 !__ini__.py
 
 #  Git Ignore File
-# 
+#
 #  This file is used to specify files and directories that should be ignored by Git.
 #  You can use various operators and patterns to match files and directories.
 #
@@ -20,7 +21,7 @@
 #  **      Matches any number of directories (including none) in a pathname.
 #  !       Negates a pattern, so files that match will not be ignored.
 #  #       Indicates a comment, which is ignored by Git.
-#           
+#
 #  Here are some examples of how to use these patterns:
 #
 #  *.pyc          Matches any files ending with .pyc.
