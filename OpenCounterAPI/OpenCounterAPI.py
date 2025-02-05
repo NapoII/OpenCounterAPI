@@ -3,7 +3,7 @@
 !!! ADD MUST HAVE INFO !!
 ------------------------------------------------
 """
-
+api_version = "1.0.1"
 #### import
 
 from flask import Flask, request, jsonify
@@ -87,6 +87,7 @@ def counter():
         "user_uniq": cleaned_data["user_uniq"],
         "count": user_data["count"],
         "date_stats": cleaned_data["date_stats"],
+        "api_version": api_version
     }
 
     return jsonify(response_data), 200
