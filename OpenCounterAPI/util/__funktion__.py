@@ -78,10 +78,10 @@ def update_date_stats(date_stats, now, user_ip):
 
     return date_stats
 
-
 def remove_keys(data, keys_to_remove):
-
-    """ Entfernt alle angegebenen Schlüssel rekursiv aus verschachtelten Strukturen. """
+    """
+    Removes all specified keys recursively from nested structures.
+    """
     if isinstance(data, dict):
         return {k: remove_keys(v, keys_to_remove) for k, v in data.items() if k not in keys_to_remove}
     elif isinstance(data, list):

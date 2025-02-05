@@ -1,7 +1,5 @@
 """Full Doku on: https://github.com/NapoII/open_page_counter_api"
 -----------------------------------------------
-!!! ADD MUST HAVE INFO !!
-------------------------------------------------
 """
 api_version = "1.0.1"
 #### import

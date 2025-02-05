@@ -1,5 +1,9 @@
-"""Full Doku on: https://github.com/NapoII/OpenCounterAPI"from util.__my_path_funktion__ import *
+"""Full Doku on: https://github.com/NapoII/OpenCounterAPI"
+-----------------------------------------------
+
+from util.__my_path_funktion__ import *
 my_file_path = my_file_path()
+
 """
 
 import os, sys
