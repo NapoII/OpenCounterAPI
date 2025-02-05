@@ -83,12 +83,14 @@ def counter():
     cleaned_data = remove_keys(page_data, keys_to_remove)
 
     response_data = {
-        "user_count_sum": cleaned_data["user_count_sum"],
-        "user_uniq": cleaned_data["user_uniq"],
+        "api":{
+            "api_version": api_version,
+            "page_name": page_name
+            },
         "count": user_data["count"],
+        "user_uniq": cleaned_data["user_uniq"],
+        "user_count_sum": cleaned_data["user_count_sum"],
         "date_stats": cleaned_data["date_stats"],
-        "api_version": api_version,
-        "page_name": page_name
     }
 
     return jsonify(response_data), 200
