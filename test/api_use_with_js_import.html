@@ -3,26 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenCounterAPI Test</title>
+    <title>Live Stats</title>
 </head>
 <body>
 
-    <h2>OpenCounterAPI Test</h2>
-    <p>Now: <span id="now">Loading...</span></p>
-    <p>Today: <span id="today">Loading...</span></p>
-    <p>Unique Users: <span id="userUniq">Loading...</span></p>
+    <h1>Live Stats</h1>
+    <p>👤 Now: <span data-placeholder="now">Loading...</span></p>
+    <p>📅 Today: <span data-placeholder="24h">Loading...</span></p>
+    <p>📆 This Week: <span data-placeholder="week">Loading...</span></p>
+    <p>📅 This Month: <span data-placeholder="month">Loading...</span></p>
+    <p>👤 Unique Users: <span data-placeholder="user_uniq">Loading...</span></p>
+
+    <!-- Include your OpenCounterAPI.js -->
+    <script src="https://api.learntogoogle.de/OpenCounterAPI.js" data-page="test"></script>
+    <!-- if js local -->
+    <!-- <script src="js/OpenCounterAPI.js" data-page="test"></script> -->
 
 </body>
 </html>
 
-<script src="js/OpenCounterAPI.js" data-page="test"></script>
 
-<!--
-
-Change in api_stats.js the target api server - defualt use:
+<!-- Change in api_stats.js the target api server - defualt use:
 https://api.learntogoogle.de/api/counter
 or use your own server.
-http://localhost:8800/api/counter
-
-
--->
+http://localhost:8800/api/counter -->

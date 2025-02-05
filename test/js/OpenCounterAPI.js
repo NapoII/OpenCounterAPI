@@ -19,7 +19,6 @@
 
         console.log("%cSent Data:", "color: #ff79c6; font-size: 14px; font-weight: bold;", requestData);
 
-        // fetch("http://127.0.0.1:8800/api/counter", {
         fetch("https://api.learntogoogle.de/api/counter", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -32,27 +31,28 @@
             return response.json();
         })
         .then(data => {
-            console.log("API Stats Response:", data);
+            console.log("✅ API Stats Response:", data);
+
+            // Update placeholders with API data
             document.querySelectorAll("[data-placeholder='now']").forEach(el => el.textContent = data.date_stats?.now?.[0] || "-");
             document.querySelectorAll("[data-placeholder='24h']").forEach(el => el.textContent = data.date_stats?.today?.[0] || "-");
+            document.querySelectorAll("[data-placeholder='week']").forEach(el => el.textContent = data.date_stats?.week?.[0] || "-");
+            document.querySelectorAll("[data-placeholder='month']").forEach(el => el.textContent = data.date_stats?.month?.[0] || "-");
             document.querySelectorAll("[data-placeholder='user_uniq']").forEach(el => el.textContent = data.user_uniq || "-");
-
         })
         .catch(error => {
-            console.error("%cAPI request failed! Please contact the API administrator.", "color: red; font-size: 14px; font-weight: bold;");
+            console.error("%c❌ API request failed! Please contact the API administrator.", "color: red; font-size: 14px; font-weight: bold;");
             console.error(error);
 
-            // Set placeholders to "-" if the API request fails
-            document.body.innerHTML = document.body.innerHTML.replace(/{{ now }}/g, "-");
-            document.body.innerHTML = document.body.innerHTML.replace(/{{ 24h }}/g, "-");
-            document.body.innerHTML = document.body.innerHTML.replace(/{{ user_uniq }}/g, "-");
+            // Set placeholders to "-" if API fails
+            document.querySelectorAll("[data-placeholder]").forEach(el => el.textContent = "-");
         });
     }
 
     document.addEventListener("DOMContentLoaded", function() {
         const scriptTags = document.getElementsByTagName("script");
         for (let script of scriptTags) {
-            if (script.src.includes("api_stats.js")) {
+            if (script.src.includes("OpenCounterAPI.js")) {
                 let params = script.getAttribute("data-page");
                 if (params) {
                     fetchStats(params);
