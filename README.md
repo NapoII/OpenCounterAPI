@@ -32,13 +32,37 @@ B. **Self-host the API** – Run it on your own server for full control. Detaile
 
 
 
-
 ## 💻 A: Use free API <a name="usage_api"></a>
 The **free hosted API** allows you to integrate page visit tracking into your website **with just a few clicks** – no setup required!
 
 In the **[test/](test/)** folder, you will find example implementations that show how to easily connect your site to the API. Simply follow the provided examples to start tracking page visits effortlessly.
 
+To integrate OpenCounterAPI into your website, add the following script tag inside your HTML:
 
+```html
+<script src="https://api.learntogoogle.de/OpenCounterAPI.js" data-page="YOUR_PAGE_NAME"></script>
+```
+
+Make sure to replace `YOUR_PAGE_NAME` with the actual name of your page.
+
+## Example Usage
+Add this snippet to display live statistics on your page:
+
+```html
+<h1>Live Stats</h1>
+<p>👤 Now: <span data-placeholder="now">Loading...</span></p>
+<p>🗓 Today: <span data-placeholder="24h">Loading...</span></p>
+<p>🖖 This Week: <span data-placeholder="week">Loading...</span></p>
+<p>🗓 This Month: <span data-placeholder="month">Loading...</span></p>
+<p>👤 Unique Users: <span data-placeholder="user_uniq">Loading...</span></p>
+
+<script src="https://api.learntogoogle.de/OpenCounterAPI.js" data-page="YOUR_PAGE_NAME"></script>
+```
+
+## Features
+- **Free & Hosted**: No backend setup required.
+- **Live Stats**: Get real-time visitor data.
+- **Easy Integration**: Just a single script tag.
 
 ## 💻 B: Host by your own <a name = "usage_own"></a>
 
@@ -74,31 +98,34 @@ sudo chmod g+s /home/counter_apiuser
 sudo su - counter_apiuser -s /bin/bash
 ```
 
+## 2. Clone the Repository
+To set up the environment for the user `counter_apiuser`, clone the repository into the appropriate directory:
 
-## 2. Set Permissions for the New User
+```bash
+cd /home/counter_apiuser && git clone https://github.com/NapoII/OpenCounterAPI
+```
 
-clone dir die repo im folder mit und vom user `counter_apiuser` mit:
-`cd /home/counter_apiuser && git clone https://github.com/NapoII/OpenCounterAPI`
+## 2. Keep the Repository Updated Automatically
+To ensure the repository stays updated, create a cron job:
 
-Um die repo immer aktuell zu halten erstele eine Crownjob mit:
-```bahse
+```bash
 crontab -e
 ```
 
-falls es dein erster crontab ist fragt dich das system welcher dein defualt textesitor ist wähle einfach die zahl aus die angeben sind bsp `1` for nano
+If this is your first time using `crontab`, the system will prompt you to choose a default text editor. Select the corresponding number, for example, `1` for nano.
 
-füge ans ende der file folgendes hinzu:
+### Add the Following Line to the Crontab File
+At the end of the file, append the following:
 
 ```ini
-
 0 3 * * * cd /home/counter_apiuser/OpenCounterAPI && git reset --hard origin/main && git pull origin main --force
-
 ```
 
-damit wird jeden einmal um 3 uhr die  repo geupdatet fasl es eine neuerung vorhadnen ist.
+This cron job will check for updates and pull the latest changes from the repository every day at 3 AM.
+
 
 ## 3. Set Up a Virtual Environment
-als user `counter_apiuser` venv erstellen
+change the user to `counter_apiuser`
 
 ```bash
 sudo su - counter_apiuser -s /bin/bash
@@ -120,7 +147,7 @@ pip install -r /home/counter_apiuser/OpenCounterAPI/requirements.txt
 ```
 
 ## 5. Configure Gunicorn as a Service
-as a normel user or root:
+As a normel user or root:
 
 Create a systemd service file for Gunicorn
 `nano /etc/systemd/system/gunicorn.counter_api.service`
@@ -148,7 +175,9 @@ sudo systemctl start gunicorn.counter_api
 sudo systemctl enable gunicorn.counter_api
 sudo systemctl status gunicorn.counter_api
 ```
-falls es einen error gibt logs erhälts du mit:
+
+If an error occurs, you can retrieve logs using the following command:
+
 ```bash
 sudo journalctl -u gunicorn.counter_api
 ```
@@ -160,12 +189,12 @@ Create an Nginx configuration file at `/etc/nginx/sites-available/open_page_coun
 ```nginx
 
 # OpenCounterAPI
-# change the config to your current steups
+# change the config to your current setup
 
 server {
     listen 80;
     listen [::]:80;
-    server_name your_domain_or_ip;
+    server_name your_domain_or_ip.com;
 
     # Forwarding from HTTP to HTTPS
     return 301 https://$host$request_uri;
@@ -174,7 +203,7 @@ server {
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
-    server_name your_domain_or_ip.de www.your_domain_or_ip;
+    server_name your_domain_or_ip.com www.your_domain_or_ip.com;
 
     # Paths to your SSL certificate and your private key
     # Change this part to your SSL certificate setup
@@ -188,7 +217,6 @@ server {
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
 
-
     location / {
         proxy_pass http://127.0.0.1:8800;
         proxy_set_header Host $host;
@@ -196,18 +224,55 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+
+    # Serve OpenCounterAPI.js directly
+    location /OpenCounterAPI.js {
+        root /home/counter_apiuser/OpenCounterAPI/test/js;
+        autoindex off;
+        add_header Content-Type application/javascript;
+    }
 }
+
 
 ```
 
-Activate the configuration:
+### Explanation of the Configuration
+
+1. **Redirect HTTP to HTTPS**
+   - The first server block listens on port 80 and redirects all requests to HTTPS using a 301 permanent redirect.
+
+2. **Handling HTTPS Traffic**
+   - The second server block listens on port 443 (SSL) and ensures secure communication.
+   - It requires a valid SSL certificate and private key (update paths accordingly).
+   - TLS v1.2 and v1.3 are enforced for security.
+
+3. **Proxying Requests to the API**
+   - Requests to the root (`/`) are forwarded to `http://127.0.0.1:8800`, where the Open Page Counter API is running.
+   - Proxy headers are set to ensure proper forwarding of the request details.
+
+4. **Serving the JavaScript API File**
+   - The `OpenCounterAPI.js` file is served directly from the specified directory.
+   - The correct content type (`application/javascript`) is added to the response.
+
+
+## Applying the Configuration
+
+After adding the configuration file, enable it by creating a symbolic link and restarting Nginx:
+
 ```bash
 sudo ln -s /etc/nginx/sites-available/open_page_counter_api /etc/nginx/sites-enabled/
-sudo nginx -t
+sudo nginx -t  # Test for syntax errors
 sudo systemctl restart nginx
 ```
 
-## 9. Important Commands for Managing the Gunicorn Service
+### Notes
+- Replace `your_domain_or_ip.com` with your actual domain or server IP.
+- Ensure that your SSL certificate paths are correctly set up.
+- The Open Page Counter API should be running on port 8800 for this configuration to work properly.
+
+
+
+# Important Commands for Managing the Gunicorn Service
 
 To manage the Gunicorn service, use the following commands:
 
@@ -236,7 +301,7 @@ sudo systemctl status gunicorn.counter_api
 sudo journalctl -u gunicorn.counter_api
 ```
 
-## 10. Fixing Permission Issues
+## Fixing Permission Issues
 
 If you encounter permission issues, run:
 ```bash
