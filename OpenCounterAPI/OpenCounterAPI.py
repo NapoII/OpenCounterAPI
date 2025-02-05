@@ -87,7 +87,8 @@ def counter():
         "user_uniq": cleaned_data["user_uniq"],
         "count": user_data["count"],
         "date_stats": cleaned_data["date_stats"],
-        "api_version": api_version
+        "api_version": api_version,
+        "page_name": page_name
     }
 
     return jsonify(response_data), 200

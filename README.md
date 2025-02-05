@@ -89,7 +89,11 @@ falls es dein erster crontab ist fragt dich das system welcher dein defualt text
 
 füge ans ende der file folgendes hinzu:
 
-`0 3 * * * cd /home/counter_apiuser/OpenCounterAPI && git pull origin main`
+```ini
+
+0 3 * * * cd /home/counter_apiuser/OpenCounterAPI && git reset --hard origin/main && git pull origin main --force
+
+```
 
 damit wird jeden einmal um 3 uhr die  repo geupdatet fasl es eine neuerung vorhadnen ist.
 
