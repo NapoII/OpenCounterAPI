@@ -1,4 +1,4 @@
-from OpenCounterAPI.OpenCounterAPI import app
+from OpenCounterAPI import app
 
 if __name__ == "__main__":
     app.run()

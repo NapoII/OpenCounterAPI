@@ -77,11 +77,24 @@ sudo su - counter_apiuser -s /bin/bash
 
 ## 2. Set Permissions for the New User
 
-Replace `/home/counter_apiuser/counter_api` with the actual path to your project directory.
+clone dir die repo im folder mit und vom user `counter_apiuser` mit:
+`cd /home/counter_apiuser && git clone https://github.com/NapoII/OpenCounterAPI`
+
+Um die repo immer aktuell zu halten erstele eine Crownjob mit:
+```bahse
+crontab -e
+```
+
+falls es dein erster crontab ist fragt dich das system welcher dein defualt textesitor ist wähle einfach die zahl aus die angeben sind bsp `1` for nano
+
+füge ans ende der file folgendes hinzu:
+
+`0 3 * * * cd /home/counter_apiuser/OpenCounterAPI && git pull origin main`
+
+damit wird jeden einmal um 3 uhr die  repo geupdatet fasl es eine neuerung vorhadnen ist.
 
 ## 3. Set Up a Virtual Environment
-
-Log in as the newly created user:
+als user `counter_apiuser` venv erstellen
 
 ```bash
 sudo su - counter_apiuser -s /bin/bash
@@ -89,52 +102,35 @@ sudo su - counter_apiuser -s /bin/bash
 
 Navigate to your project directory and set up the virtual environment:
 
+
 ```bash
 cd /home/counter_apiuser
-mkdir counter_api
-cd counter_api
 python3 -m venv venv
 source venv/bin/activate
 ```
 
 ## 4. Install Flask and Gunicorn
 
-Move `requirements.txt` to `/home/counter_apiuser`, then install Flask and Gunicorn inside the virtual environment:
-
 ```bash
-pip install -r requirements.txt
+pip install -r /home/counter_apiuser/OpenCounterAPI/requirements.txt
 ```
 
-## 5. Set Up the Flask Application `open_page_counter_api.py`
+## 5. Configure Gunicorn as a Service
+as a normel user or root:
 
-Clone the repository and move the contents:
-
-```bash
-git clone https://git.napo-ii.de/napo/OpenCounterAPI.git
-mv * ../    # Move all files since the structure is too deep
-mv .[^.]* ../  # Move hidden files like .git
-```
-
-Delete the empty folder:
-```bash
-cd ..
-rm -r OpenCounterAPI
-```
-
-## 6. Configure Gunicorn as a Service
-
-Create a systemd service file for Gunicorn at `/etc/systemd/system/gunicorn.counter_api.service`:
+Create a systemd service file for Gunicorn
+`nano /etc/systemd/system/gunicorn.counter_api.service`
 
 ```ini
 [Unit]
-Description=Gunicorn instance to service open_page_counter_api
+Description=Gunicorn instance to service OpenCounterAPI
 After=network.target
 
 [Service]
 User=counter_apiuser
 Group=www-data
-WorkingDirectory=/home/counter_apiuser/counter_api
-ExecStart=/home/counter_apiuser/counter_api/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8800 wsgi:app
+WorkingDirectory=/home/counter_apiuser/OpenCounterAPI/OpenCounterAPI
+ExecStart=/home/counter_apiuser/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8800 wsgi:app
 
 [Install]
 WantedBy=multi-user.target
@@ -146,6 +142,11 @@ Start the Gunicorn service and enable it to run at startup:
 ```bash
 sudo systemctl start gunicorn.counter_api
 sudo systemctl enable gunicorn.counter_api
+sudo systemctl status gunicorn.counter_api
+```
+falls es einen error gibt logs erhälts du mit:
+```bash
+sudo journalctl -u gunicorn.counter_api
 ```
 
 ## 8. Configure Nginx
